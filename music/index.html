@@ -2,11 +2,32 @@
 
 <html>
 <head>
-<title>再生</title>
+<title></title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<script type="text/javascript">
+<!--
+var localization_ja={
+  page_title:"音楽プレイヤー",
+  tab_artist:"アーティスト",tab_album:"アルバム",tab_all_songs:"全曲",tab_result:"検索結果",tab_playlist:"プレイリスト",tab_genre:"ジャンル",
+  leave_confirm:"音楽を停止しページを離脱しますか。",
+  table_track:"番号",table_length:"長さ",table_song_title:"曲名",table_album_title:"アルバム",table_song_artist:"アーティスト",table_album_artist:"アーティスト"};
+var localization_en={
+  page_title:"Music Player",
+  tab_artist:"Artist",tab_album:"Album",tab_all_songs:"All",tab_result:"Result",tab_playlist:"Playlist",tab_genre:"Genre",
+  leave_confirm:"Do you really leave?",
+  table_track:"Track",table_length:"Length",table_song_title:"Title",table_album_title:"Album",table_song_artist:"Album Artist",table_album_artist:"Song Artist"};
+
+// Change here to localize;
+var localization=localization_ja;
+document.title=localization.page_title;
+-->
+</script>
 <style type="text/css">
 <!--
+button:focus{
+outline:none;
+}
 div.tab{
 display:flex;
 background-color:#fff;
@@ -50,6 +71,70 @@ display:none;
 }
 #tab_playlist.selected_tab{
 display:inherit;
+}
+
+#item_player_top_right{
+position: absolute;
+top: 0;
+right: 0;
+max-width: 100%;
+overflow: hidden;
+display: flex;
+align-items: center;
+justify-content: flex-end;
+}
+div.label_time{
+font-size:12px;
+color:#666;
+padding:0 5px;
+}
+
+#song_infos{
+flex-grow:1;
+flex:1;
+max-width:100%;
+width:100%;
+display: inline-block;
+}
+
+div.wrapper_image{
+position: relative;
+float: left;
+border: 0;
+padding: 0;
+margin: 0 10px 0 0;
+height: 90px;
+width: 90px;
+top: -4px;
+z-index:0;
+}
+#img_current_album{
+width:100%;
+height:100%;
+}
+
+div.container_currently_playing{
+display:flex;
+align-items:center;
+height:100%;
+overflow:hidden;
+}
+div.container_currently_playing_content{
+flex:1;
+min-width:0px;
+max-height:100%;
+}
+div.container_currently_playing_content div{
+text-overflow:ellipsis;
+overflow:hidden;
+text-align:left;
+}
+#text_container_currently_playing_main{
+font-size:16px;
+}
+#text_container_currently_playing_detail{
+font-size:13px;
+color:#666;
 }
 
 div.song{
@@ -156,6 +241,9 @@ transform-origin: left center;
 will-change: transform;
 }
 @media screen and (max-width: 599px) {
+div.wrapper_image{
+display:none;
+}
 #img_volume_small{
 display:none;
 }
@@ -187,6 +275,9 @@ padding:0px;
 }
 }
 @media screen and (max-width: 349px) {
+div.container_currently_playing{
+display:none;
+}
 #volume_control div.slider{
 width:30px;
 }
@@ -275,6 +366,7 @@ position:absolute;
 top:-15px;
 left:0px;
 width:100%;
+z-index:2;
 }
 
 div.controler div.controler_progress div.slider{
@@ -310,7 +402,9 @@ will-change: transform;
 display:flex;
 justify-content: center;
 width:100%;
-top:calc(15px + 4px);
+/*top:calc(15px + 4px);*/
+top:4px;
+height:calc(90px - 4px);
 position:relative;
 }
 #controler_buttons{
@@ -341,22 +435,22 @@ align-items: center;
 <img src="img/goback.svg" />
 </div>
 <div id="tab_artist" onClick="SelectArtist()">
-<p>アーティスト</p>
+<p><script>document.write(localization.tab_artist);</script></p>
 </div>
 <div id="tab_album" onClick="SelectAlbum()">
-<p>アルバム</p>
+<p><script>document.write(localization.tab_album);</script></p>
 </div>
 <div id="tab_song" onClick="SelectSong()">
-<p>全曲</p>
+<p><script>document.write(localization.tab_all_songs);</script></p>
 </div>
 <div id="tab_result">
-<p>検索結果</p>
+<p><script>document.write(localization.tab_result);</script></p>
 </div>
 <div id="tab_playlist">
-<p>プレイリスト</p>
+<p><script>document.write(localization.tab_playlist);</script></p>
 </div>
 <div id="tab_genre" onClick="SelectGenre()">
-<p>ジャンル</p>
+<p><script>document.write(localization.tab_genre);</script></p>
 </div>
 </div>
 <div class="main">
@@ -378,7 +472,17 @@ align-items: center;
 <audio id="audio" style="width:100%;" autoplay onended="PlayNextAutomatic();" onplay="ChangePlayStatePlay();"
    onpause="ChangePlayStatePause();" ontimeupdate="TimeUpdate();" onvolumechange="VolumeChange();"></audio>
 <div id="controler_group">
-<div style="flex-grow:1;flex:1;"></div>
+<div id="song_infos">
+<div class="wrapper_image">
+<img id="img_current_album" src="img/cd.svg" onerror="this.src='img/cd.svg'"/>
+</div>
+<div class="container_currently_playing">
+<div class="container_currently_playing_content">
+<div id="text_container_currently_playing_main"></div>
+<div id="text_container_currently_playing_detail"></div>
+</div>
+</div>
+</div>
 <div id="controler_buttons" class="state_no_playlist">
 <button id="control_button_loop" onclick="ToggleLoop();" class="state_loop_0"><img class="image_loop_0" src="img/loop.svg" /><img class="image_loop_1" src="img/loop.svg" /><img class="image_loop_2" src="img/loop1.svg" /><img class="image_loop_3" src="img/mix2.svg" /></button>
 <button onclick="PlayBackOperated();"><img src="img/nextc.svg" style="transform: scale(-1, 1);"/></button>
@@ -387,11 +491,16 @@ align-items: center;
 <button onclick="SelectPlaylist();"><img src="img/playlist3.svg"/></button>
 </div>
 <div id="other_setting" style="flex-grow:1;flex:1;">
+<div id="item_player_top_right">
+<div class="label_time">
+<span id="text_container_time_current">00:00</span> / <span id="text_container_time_duration">00:00</span>
+</div>
+</div>
 <div id="volume_control">
-<img id="img_volume_small" src="img/volume3.svg" style="height:30px;" />
+<img id="img_volume_small" src="img/volume3.svg" style="height:30px;" onclick="SliderClickVolumeMute();" />
 <div class="slider" onclick="SliderClickVolume(this,event);">
 <div class="progress_container">
-<div id="progress1_volume" class="progress1" />
+<div id="progress1_volume" class="progress1"/>
 </div>
 </div>
 </div>
@@ -423,7 +532,7 @@ VolumeChange();
 
 window.addEventListener("beforeunload", function (e) {
   if(!Playlist){return;}
-  var confirmationMessage = "音楽を停止しページを離脱しますか。";
+  var confirmationMessage = localization.leave_confirm;
   e.returnValue = confirmationMessage;
   return confirmationMessage;
 });
@@ -439,6 +548,9 @@ function UpdateSongStyle(id){
   document.styleSheets[0].insertRule("tr.table_song_"+id+"{background-color:#f0f0f0;}",0);
 }
 
+function SliderClickVolumeMute(){
+  audio.volume=0;
+}
 function SliderClickVolume(from,event){
   if(! Playlist){return;}
   var clientRect = from.getBoundingClientRect();
@@ -471,6 +583,14 @@ function CanSeek(timeranges,time){
 function TimeUpdate(){
   var progress = document.getElementById("progress1");
   progress.style="transform: scaleX("+GetCurrentRate()+");"
+
+  var audio = document.getElementById("audio");
+
+  var text1 = document.getElementById("text_container_time_current");
+  text1.innerText=GetTimeText(audio.currentTime);
+
+  var text1 = document.getElementById("text_container_time_duration");
+  text1.innerText=GetTimeText(Playlist[PlayingCnt]["Duration"]);
 }
 function VolumeChange(){
   var audio = document.getElementById("audio");
@@ -543,8 +663,8 @@ function SelectSong(){
   ClearChild(document.getElementById("song"));
   var songs=Song;
   songs.sort(SortSongs);
-  SetSongToTable(songs,[new SongInfoTable("#","Track"),new SongInfoTable("長さ","Length"),new SongInfoTable("曲名","Title")
-    ,new SongInfoTable("アーティスト","ArtistName"),new SongInfoTable("アルバム","AlbumName")]);
+  SetSongToTable(songs,[new SongInfoTable(localization.table_track,"Track"),new SongInfoTable(localization.table_length,"Length"),new SongInfoTable(localization.table_song_title,"Title")
+    ,new SongInfoTable(localization.table_song_artist,"ArtistName"),new SongInfoTable(localization.table_album_title,"AlbumName")]);
 }
 function SelectPlaylist(){
   if(Playlist==null){return;}
@@ -555,8 +675,8 @@ function SelectPlaylist(){
   ClearChild(document.getElementById("song"));
   var songs=Playlist;
   songs.sort(SortSongs);
-  SetSongToTable(songs,[new SongInfoTable("#","Track"),new SongInfoTable("長さ","Length"),new SongInfoTable("曲名","Title")
-    ,new SongInfoTable("アーティスト","ArtistName"),new SongInfoTable("アルバム","AlbumName")]);
+  SetSongToTable(songs,[new SongInfoTable(localization.table_track,"Track"),new SongInfoTable(localization.table_length,"Length"),new SongInfoTable(localization.table_song_title,"Title")
+    ,new SongInfoTable(localization.table_song_artist,"ArtistName"),new SongInfoTable(localization.table_album_title,"AlbumName")]);
 }
 function SelectGenre(){
   HistoryPush(SelectGenre);
@@ -690,6 +810,8 @@ function PlaySimple(num,from){
     ,'.ogg':'audio/ogg; codecs="vorbis"','.m4a':'audio/mp4; codecs="mp4a.40.2'};
   UpdateSongStyle(currentsong["Id"]);
 
+  OnPlay(currentsong);
+
   if(mtlist[currentsong["Format"]] && audio.canPlayType(mtlist[currentsong["Format"]])){
     audio.src= GetAudioSource(currentsong,null,from);
     PlayNative=true;
@@ -701,6 +823,20 @@ function PlaySimple(num,from){
   else if(audio.canPlayType(mtlist[".m4a"])){audio.src = GetAudioSource(currentsong,"m4a",from);}
   else if(audio.canPlayType(mtlist[".mp3"])){audio.src = GetAudioSource(currentsong,"mp3",from);}
 }
+function OnPlay(song){
+  var album=GetAlbumById(song["AlbumId"]);
+  var artist=GetArtistById(album["ArtistID"]);
+
+  var text1 = document.getElementById("text_container_currently_playing_main");
+  text1.innerText=song["Track"]+". "+song["Title"];
+
+  var text2 = document.getElementById("text_container_currently_playing_detail");
+  text2.innerText=artist["Name"]+" - "+album["Title"];
+
+  var albumImg = document.getElementById("img_current_album");
+  albumImg.src=GetAlbumThumb(album);
+}
+
 function GetAudioSource(currentsong,f,from){
   var result="music.cgi?id="+currentsong["Id"];
   if(f){
@@ -740,9 +876,12 @@ function SelectAlbum(){
     });
   for(var item in tempList){
     var crtitem=tempList[item];
-    PushCardToContainer(container,crtitem["Title"],GetArtistById(crtitem["ArtistID"])["Name"],(crtitem["ThumbExist"]==0?"img/cd.svg": "thumb.cgi?id="+crtitem["Id"]),"img/cd.svg",
+    PushCardToContainer(container,crtitem["Title"],GetArtistById(crtitem["ArtistID"])["Name"],GetAlbumThumb(crtitem),"img/cd.svg",
       (function(id){return function(){ShowAlbum(id);}})(tempList[item]["Id"]));
   }
+}
+function GetAlbumThumb(album){
+  return album["ThumbExist"]==0?"img/cd.svg": "thumb.cgi?id="+album["Id"];
 }
 function GetArtistThumb(artistid){
   for(var key in Album){
@@ -796,7 +935,7 @@ function ShowGenre(genre){
     }
   }
   tempListS.sort(SortSongs);
-  SetSongToTable(tempListS,[new SongInfoTable("番号","Track"),new SongInfoTable("長さ","Length"),new SongInfoTable("曲名","Title"),new SongInfoTable("アルバム","AlbumName")]);
+  SetSongToTable(tempListS,[new SongInfoTable(localization.table_track,"Track"),new SongInfoTable(localization.table_length,"Length"),new SongInfoTable(localization.table_song_title,"Title"),new SongInfoTable(localization.table_album_artist,"ArtistName"),new SongInfoTable(localization.table_album_title,"AlbumName")]);
 }
 function ShowArtist(artistid){
   HistoryPush(
@@ -827,7 +966,7 @@ function ShowArtist(artistid){
     }
   }
   tempListS.sort(SortSongs);
-  SetSongToTable(tempListS,[new SongInfoTable("番号","Track"),new SongInfoTable("長さ","Length"),new SongInfoTable("曲名","Title"),new SongInfoTable("アルバム","AlbumName")]);
+  SetSongToTable(tempListS,[new SongInfoTable(localization.table_track,"Track"),new SongInfoTable(localization.table_length,"Length"),new SongInfoTable(localization.table_song_title,"Title"),new SongInfoTable(localization.table_album_title,"AlbumName") ,new SongInfoTable(localization.table_song_artist,"ArtistName")]);
 }
 function ShowAlbum(albumid){
   HistoryPush(
@@ -846,7 +985,7 @@ function ShowAlbum(albumid){
     }
   }
   tempListS.sort(SortSongs);
-  SetSongToTable(tempListS,[new SongInfoTable("番号","Track"),new SongInfoTable("長さ","Length"),new SongInfoTable("曲名","Title")]);
+  SetSongToTable(tempListS,[new SongInfoTable(localization.table_track,"Track"),new SongInfoTable(localization.table_length,"Length"),new SongInfoTable(localization.table_song_title,"Title"),new SongInfoTable(localization.table_song_artist,"ArtistName")]);
 }
 function ClearChild(container){
   var mainbox = document.getElementsByClassName("main")[0];

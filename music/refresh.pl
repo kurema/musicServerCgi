@@ -46,8 +46,8 @@ my @files=glob('"'.File::Spec->catfile($info->{"filename"},"*").'"');
 my $minsize=$conf{"thumbmax"};
 foreach my $file (@files){
 my ($ext) = $file=~ m/(\.[^\.]+$)/;
-if(index($conf{"thumbexts"},$ext)>=0){
-if((-s $file)<$minsize){
+if($ext ne "" && index($conf{"thumbexts"},$ext)>=0){
+if((-e $file) && (-s $file)<$minsize){
 $dbh->do("update album set thumbexist=1 where id =".$info->{"id"}.";");
 last;
 }

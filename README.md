@@ -4,15 +4,29 @@ cgiで作った音楽サーバーです。
 イントラサーバーとしての利用を想定しています。
 
 ## スクリーンショット
-![PC](screenshot/pc01.png)
-![PC](screenshot/pc05.png)
+![PC](screenshot/pc07.png)
+![PC](screenshot/pc10.png)
 ![PC](screenshot/pc03.png)
 ![スマホ](screenshot/ip01.png)
 ![スマホ](screenshot/ip02.png)
-![タブレット](screenshot/tb01.png)
+![タブレット](screenshot/tb03.png)
+
+Vivaldiのキャプチャを使っているのでシャドウが消えています。  
+色を変えたい場合はsvg画像も変更が必要です。
 
 ## Translate
-fork me and translate.
+To switch to English UI, change
+```index.html
+// Change here to localize;
+var localization=localization_ja;```
+to
+```index.html
+// Change here to localize;
+var localization=localization_en;```
+
+Other languages can be supported by adding another translation.
+
+cf.
 
 | Japanese | English |
 |:---------|:--------|
@@ -23,8 +37,7 @@ fork me and translate.
 |番号|number|
 |長さ|length|
 |曲名|title of the song|
-
-internationalization may be supported in future version.
+|検索結果|search result|
 
 ## 使い方
 1. 適当なサーバー(Linuxを想定)にApache,ffmpeg,perlをセットアップする。
@@ -41,6 +54,8 @@ restful風apiからデータを取得して、UI周りはJavaScriptでやって�
 jQueryやらは使わない純然たるJSなので10年くらいたってもノーメンテで動くと思います。  
 非対応形式はサーバー側がffmpegでトランスコードして、その場合はシークもサーバー側でやっています。  
 レスポンシブデザインにも対応していてスマホでもそれなりに見えます。
+
+なんとなくsqliteを使っていますが、MySQLを使いたい人は割と簡単に書き換えられるはずです。
 
 ## api
 レスポンスはJSONのみです。  
@@ -59,6 +74,9 @@ restful風ですが普通にcgiです。
 |api.cgi/artist|全アーティストを取得|
 |api.cgi/artist/1|IDが1のアーティストを取得|
 
+index.htmlは起動時に全データを取得しています。  
+``ArtistID``と``AlbumId``で大文字小文字が混在してしまっています。そのうち直します。
+
 ### music.cgi
 
 | URL | 内容 |
@@ -67,7 +85,8 @@ restful風ですが普通にcgiです。
 |music/music.cgi?id=1&f=wav|ffmpegでwav形式に変換して取得|
 |music/music.cgi?id=1&f=wav&from=10.0|wav形式で先頭から10秒以降を取得|
 
-フォーマット変換は現状wav/mp3/oggに対応しています。
+フォーマット変換は現状wav/mp3/oggに対応しています(m4aは挙動がおかしい。)  
+index.htmlはトランスコードはデフォルトでwavが最優先なので帯域が細い場合にはいくらか変更が必要です。
 
 ### thumb.cgi
 アルバムサムネイル取得の為のapiです。  
@@ -82,4 +101,12 @@ ID3タグなどは見ておらず、フォルダ内で一番軽い画像を返�
 
 ### refresh.pl
 タグ情報を取得する為にファイル更新毎に実行が必要です。  
-取得にはffprobeを使っています。
+取得にはffprobeを使っています。  
+crontabに登録しておくか、適宜実行しましょう。
+
+## 代替
+| ソフト | 内容|
+|:--|:--|
+|miniDLNA|DLNAでは定番です。<br />対応アプリも多いのでネイティブアプリ・ソフトを使いたいならこちら。<br/>自分の環境だとちょっと動作がおかしいです。|
+|Music apps.ownCloud.com|私が最初に検討したのがこれです。ただ何となくownCloudが嫌なのでやめました。|
+|Google Play Music|外出先で使うならこれ一択です。<br />自分のコレクションだけなら無料で(一旦クレカ登録が必要)どこからでも聞けます。|

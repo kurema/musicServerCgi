@@ -23,22 +23,21 @@ my $sth=$dbh->prepare("select * from album where id =".$id);
 $sth->execute;
 my $info=$sth->fetchrow_hashref;
 $sth->finish;
+$dbh->disconnect;
 
 if($info->{"filename"} eq ""){exit;}
 my @files=glob('"'.File::Spec->catfile($info->{"filename"},"*").'"');
 my $minsize=$conf{"thumbmax"};
 my $minsizeFile="";
 foreach my $file (@files){
-my ($ext) = $file=~ m/(\.[^\.]+$)/;
-if(index($conf{"thumbexts"},$ext)>=0){
-if((-s $file)<$minsize){$minsize=-s $file;$minsizeFile=$file;}
+my ($ext) = $file=~ m/(\.[^\.]+)$/;
+if($ext ne "" && index($conf{"thumbexts"},$ext)>=0){
+if((-e $file) && (-s $file)<$minsize){$minsize=-s $file;$minsizeFile=$file;}
 }
 }
 if($minsizeFile ne ""){
-$dbh->disconnect;
 TransferFile($minsizeFile);
 }else{
-$dbh->disconnect;
 print "Status: 404 Not Found\n\n";
 }
 
