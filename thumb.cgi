@@ -13,6 +13,7 @@ require File::Spec->catfile(dirname(__FILE__),"commonm.pl");
 my %conf=GetConf(File::Spec->catfile(dirname(__FILE__),"music.conf"));
 
 my $dbh = DBI->connect("dbi:SQLite:dbname=".$conf{"sqlitedb"});
+$dbh->{sqlite_unicode} = 1;
 
 my $q = new CGI;
 my ($id) = $q->param('id')=~ m/(\d+)/;
@@ -21,21 +22,23 @@ if($id eq "" || ! defined($id)){exit;}
 my $sth=$dbh->prepare("select * from album where id =".$id);
 $sth->execute;
 my $info=$sth->fetchrow_hashref;
-$dbh->disconnect;
+$sth->finish;
 
 if($info->{"filename"} eq ""){exit;}
 my @files=glob('"'.File::Spec->catfile($info->{"filename"},"*").'"');
-my $minsize=1e6;
+my $minsize=$conf{"thumbmax"};
 my $minsizeFile="";
 foreach my $file (@files){
-if($file=~ m/.png$|.jpg$|.jpeg$|.thumb$/){
+my ($ext) = $file=~ m/(\.[^\.]+$)/;
+if(index($conf{"thumbexts"},$ext)>=0){
 if((-s $file)<$minsize){$minsize=-s $file;$minsizeFile=$file;}
 }
 }
 if($minsizeFile ne ""){
+$dbh->disconnect;
 TransferFile($minsizeFile);
-}
-else{
+}else{
+$dbh->disconnect;
 print "Status: 404 Not Found\n\n";
 }
 

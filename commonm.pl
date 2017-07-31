@@ -46,6 +46,7 @@ print <<"HEAD";
 Status: 206 Partial Content
 Content-Length: $length
 Content-Range: bytes $start-$end/$filesize
+
 HEAD
 
     binmode STDOUT;

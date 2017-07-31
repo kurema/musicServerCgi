@@ -7,18 +7,49 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <style type="text/css">
 <!--
+div.tab{
+display:flex;
+background-color:#fff;
+box-shadow:0 0 8px rgba(0,0,0,.4);
+position:relative;
+z-index:3;
+overflow-x:auto;
+height:40px;
+-ms-overflow-style: none;
+margin:0px;
+}
+div.tab::-webkit-scrollbar{
+  display:none;
+}
+div.tab::scrollbar{
+  display:none;
+}
 div.tab div{
 margin:0px;
-padding:5px 10px;
-display:inline-flex;
-}
 
+padding:0px 10px;
+display:inline-flex;
+height 100%;
+}
 div.tab div p{
-margin:5px 5px;
+margin:auto 5px;
+white-space: nowrap
 }
 div.tab div.selected_tab{
 font-weight:800;
 border-bottom:2px solid #ff5722;
+}
+#tab_result{
+display:none;
+}
+#tab_result.selected_tab{
+display:inherit;
+}
+#tab_playlist{
+display:none;
+}
+#tab_playlist.selected_tab{
+display:inherit;
 }
 
 div.song{
@@ -26,8 +57,11 @@ box-shadow:0 0 8px rgba(0,0,0,.4);
 margin:20px;
 overflow:auto;
 background-color:#fff;
+padding:10px;
 }
-
+div.song:empty{
+display:none;
+}
 div.container{
 display:flex;
 margin:10px;
@@ -41,6 +75,10 @@ height:220px;
 box-shadow:0 0 8px rgba(0,0,0,.4);
 margin:10px;
 overflow:hidden;
+transition:box-shadow 0.5s ease;
+}
+div.container div.material_card:hover{
+box-shadow:0 0 30px rgba(0,0,0,.4);
 }
 div.container div.material_card img{
 width:170px;
@@ -65,17 +103,65 @@ div.song table{
 width:100%;
 table-layout:auto;
 border-spacing:5px;
+border-color:rgba(0,0,0,0);
+background-color:transparent;
+border-collapse:collapse;
+}
+div.song table:empty{
+display:none;
 }
 div.song table tr{
 overflow:hidden;
 white-space:nowrap;
 padding:3px;
+transition:background-color 0.5s ease;
 }
-div.song table tr td{
+div.song table tr:hover{
+background-color:#EEE;
+}
+div.song table tr td, div.song table tr th{
 overflow:hidden;
-padding:5px;
+padding:7px;
+}
+div.song table th{
+text-align:left;
+}
+#controler_buttons button{
+padding:8px;
+}
+#volume_control{
+/*visibility:hidden;*/
+display:flex;
+justify-content: flex-end;
+align-items: center;
+}
+#volume_control:hover{
+visibility:visible;
+}
+#volume_control div.slider{
+width:100px;
+height:30px;
+cursor:pointer;
+}
+#volume_control div.progress_container{
+width:100%;
+background-color:#bbb;
+margin:13px 0;
+}
+#volume_control div.progress1{
+height:4px;
+background:#ff5722;
+width:100%;
+transform-origin: left center;
+will-change: transform;
 }
 @media screen and (max-width: 599px) {
+#img_volume_small{
+display:none;
+}
+#volume_control div.slider{
+width:50px;
+}
 div.container div.material_card{
 width:150px;
 height:200px;
@@ -90,16 +176,170 @@ font-size:12px;
 div.container div.material_card div p.detail{
 font-size:10px;
 }
-div.song table{
-border-spacing:15px;
+div.song table tr td, div.song table tr th{
+padding:10px;
 }
+div.tab{
+font-size:12px;
+}
+#controler_buttons button{
+padding:0px;
+}
+}
+@media screen and (max-width: 349px) {
+#volume_control div.slider{
+width:30px;
+}
+div.container div.material_card{
+width:100px;
+height:150px;
+}
+div.container div.material_card img{
+width:100px;
+height:100px;
+}
+div.tab{
+font-size:8px;
+}
+#controler_buttons button{
+padding:0px;
+}
+}
+div.main{
+position:fixed;
+top:40px;
+width:100%;
+height:calc(100% - 90px - 40px);
+overflow-y:auto;
+}
+div.controler{
+box-shadow:0 0 8px rgba(0,0,0,.4);
+background-color:#fff;
+height:90px;
+position:fixed;
+bottom:0;width:100%;
+text-align: center;
+vertical-align: middle;
+}
+body{
+margin:0;
+background-color:#F4F4F4;
+}
+#control_button_play img{
+display:none;
+}
+#control_button_play.state_pausing img.image_play{
+display:inherit;
+}
+#control_button_play.state_playing img.image_pause{
+display:inherit;
+}
+#control_button_loop img{
+display:none;
+}
+#control_button_loop.state_loop_0 img.image_loop_0{
+display:inherit;
+filter:opacity(0.5);
+}
+#control_button_loop.state_loop_1 img.image_loop_1{
+display:inherit;
+}
+#control_button_loop.state_loop_2 img.image_loop_2{
+display:inherit;
+}
+#control_button_loop.state_loop_3 img.image_loop_3{
+display:inherit;
+}
+div.controler button {
+  width: auto;
+  padding:0;
+  margin:0;
+  background:none;
+  border:0;
+  font-size:0;
+  line-height:0;
+  overflow:visible;
+  cursor:pointer;
+}
+div.controler button img {
+  height:30px;
+}
+#control_button_play img{
+  height:60px;
+}
+#goback_div.goback_state_empty img{
+filter:opacity(0.5);
+}
+div.controler div.controler_progress{
+position:absolute;
+top:-15px;
+left:0px;
+width:100%;
+}
+
+div.controler div.controler_progress div.slider{
+width:100%;
+height:calc(30px + 4px);
+cursor:pointer;
+}
+/*
+div.controler div.controler_progress div.progress_bar{
+width:100%;
+height:calc(30px + 4px);
+}
+*/
+div.controler div.controler_progress div.progress_container{
+padding:15px 0px;
+height:4px;
+}
+div.controler div.controler_progress div.progress1{
+height:4px;
+background:#ff5722;
+/*
+position: absolute;
+top: 0;
+right: 0;
+bottom: 0;
+left: 0;
+*/
+width:100%;
+transform-origin: left center;
+will-change: transform;
+}
+#controler_group{
+display:flex;
+justify-content: center;
+width:100%;
+top:calc(15px + 4px);
+position:relative;
+}
+#controler_buttons{
+display:flex;
+align-items: center;
+justify-content: center;
+}
+#controler_buttons.state_no_playlist #control_button_loop{
+filter:none;
+opacity: 1.0;
+}
+#controler_buttons.state_no_playlist button{
+filter:grayscale(100%);
+opacity: 0.5;
+}
+#other_setting{
+display: flex;
+justify-content: flex-end;
+align-items: center;
 }
 -->
 </style>
 </head>
-<body style="margin:0;background-color:#DDD;">
+<body>
 
-<div id="tab" class="tab" style="display:flex;background-color:#fff;box-shadow:0 0 8px rgba(0,0,0,.4);">
+<div id="tab" class="tab">
+<div onclick="HistoryPop();" id="goback_div" class="goback_state_empty">
+<img src="img/goback.svg" />
+</div>
 <div id="tab_artist" onClick="SelectArtist()">
 <p>アーティスト</p>
 </div>
@@ -112,69 +352,262 @@ border-spacing:15px;
 <div id="tab_result">
 <p>検索結果</p>
 </div>
+<div id="tab_playlist">
+<p>プレイリスト</p>
 </div>
-<div style="position:fixed;top:60px;width:100%;height:calc(100% - 90px - 60px);overflow-y:auto;">
+<div id="tab_genre" onClick="SelectGenre()">
+<p>ジャンル</p>
+</div>
+</div>
+<div class="main">
 <div id="container" class="container">
 </div>
-<div id="song" class="song">
-<table id="table_song">
-</table>
+<div id="song" class="song"></div>
+</div>
+<div id="controler" class="controler">
+<div class="controler_progress">
+<div class="slider" id="progress_slider" onclick="SliderClick(this,event);">
+<!--<div class="progress_bar" role="progressbar">-->
+<div class="progress_container">
+<div class="progress1" id="progress1" style="transform:scaleX(0);"/>
 </div>
 </div>
-<div id="controler"
- style="box-shadow:0 0 8px rgba(0,0,0,.4);background-color:#fff;height:90px;position:fixed;bottom:0;width:100%;">
-<audio id="audio" controls style="width:100%;" autoplay></audio>
+<!--</div>-->
+</div>
+</div>
+<audio id="audio" style="width:100%;" autoplay onended="PlayNextAutomatic();" onplay="ChangePlayStatePlay();"
+   onpause="ChangePlayStatePause();" ontimeupdate="TimeUpdate();" onvolumechange="VolumeChange();"></audio>
+<div id="controler_group">
+<div style="flex-grow:1;flex:1;"></div>
+<div id="controler_buttons" class="state_no_playlist">
+<button id="control_button_loop" onclick="ToggleLoop();" class="state_loop_0"><img class="image_loop_0" src="img/loop.svg" /><img class="image_loop_1" src="img/loop.svg" /><img class="image_loop_2" src="img/loop1.svg" /><img class="image_loop_3" src="img/mix2.svg" /></button>
+<button onclick="PlayBackOperated();"><img src="img/nextc.svg" style="transform: scale(-1, 1);"/></button>
+<button id="control_button_play" onclick="Play();" class="state_pausing"><img class="image_play" src="img/play.svg"/><img class="image_pause" src="img/pause.svg"/></button>
+<button onclick="PlayNextOperated();"><img src="img/nextc.svg"/></button>
+<button onclick="SelectPlaylist();"><img src="img/playlist3.svg"/></button>
+</div>
+<div id="other_setting" style="flex-grow:1;flex:1;">
+<div id="volume_control">
+<img id="img_volume_small" src="img/volume3.svg" style="height:30px;" />
+<div class="slider" onclick="SliderClickVolume(this,event);">
+<div class="progress_container">
+<div id="progress1_volume" class="progress1" />
+</div>
+</div>
+</div>
+<img src="img/volume2.svg" style="height:30px;" />
+</div>
+</div>
+</div>
 </div>
 <script>
 //<[CDATA[
 var Album;
 var Song;
 var Artist;
+var PlaylistDisplayed;
+var Playlist;
+var PlayingCnt=-1;
+var LoopMode=0;//0:なし。1:全体繰り返し。2:同曲繰り返し。3:シャッフル。
+var History=[];
+var HistoryCurrentFunc;
+var InitDone;
+var PlayNative;
+var PlayOffset;
 
 GetAlbumAll(function(){});
-GetSongAll(function(){});
-GetArtistAll(function(){SelectArtist();});
+GetSongAll(function(){if(Artist && Album && !InitDone){SelectArtist();InitDone=1;}});
+GetArtistAll(function(){if(Artist && Album && !InitDone){SelectArtist();InitDone=1;}});
+AppendStyle();
+VolumeChange();
 
-function SelectTag(id){
-  for(key in document.getElementById("tab").childNodes){
+window.addEventListener("beforeunload", function (e) {
+  if(!Playlist){return;}
+  var confirmationMessage = "音楽を停止しページを離脱しますか。";
+  e.returnValue = confirmationMessage;
+  return confirmationMessage;
+});
+function AppendStyle(){
+/*
+  var blankStyle = document.createElement('style');
+  blankStyle.type = "text/css";
+  NewStyleSheet = document.getElementsByTagName('head').item(0).appendChild(blankStyle);*/
+  document.styleSheets[0].insertRule("tr.table_song_-1{}",0);
+}
+function UpdateSongStyle(id){
+  document.styleSheets[0].deleteRule(0);
+  document.styleSheets[0].insertRule("tr.table_song_"+id+"{background-color:#f0f0f0;}",0);
+}
+
+function SliderClickVolume(from,event){
+  if(! Playlist){return;}
+  var clientRect = from.getBoundingClientRect();
+  var positionX = clientRect.left + window.pageXOffset;
+  var x = event.pageX - positionX;
+  var w = from.clientWidth;
+  var audio = document.getElementById("audio");
+  audio.volume=x/w;
+}
+function SliderClick(from,event){
+  if(! Playlist){return;}
+  var clientRect = from.getBoundingClientRect();
+  var positionX = clientRect.left + window.pageXOffset;
+  var x = event.pageX - positionX;
+  var w = from.clientWidth;
+  var audio = document.getElementById("audio");
+  var t=Playlist[PlayingCnt]["Duration"]*x/w;
+  if((PlayNative && CanSeek(audio.seekable,t-PlayOffset)) ||(!PlayNative && CanSeek(audio.buffered,t-PlayOffset))){
+    audio.currentTime=t-PlayOffset;
+  }else{
+    SeekOnServer(t);
+  }
+}
+function CanSeek(timeranges,time){
+  for(var i=0;i<timeranges.length;i++){
+     if(timeranges.start(i)<= time && time <timeranges.end(i)){return true;}
+  }
+  return false;
+}
+function TimeUpdate(){
+  var progress = document.getElementById("progress1");
+  progress.style="transform: scaleX("+GetCurrentRate()+");"
+}
+function VolumeChange(){
+  var audio = document.getElementById("audio");
+  var progress = document.getElementById("progress1_volume");
+  progress.style="transform: scaleX("+audio.volume+");";
+}
+function GetCurrentRate(){
+  if(Playlist){
+    var audio = document.getElementById("audio");
+    return (audio.currentTime+PlayOffset)/Playlist[PlayingCnt]["Duration"];
+  }else{
+    return 0;
+  }
+}
+function HistoryItem(func,scroll){
+  this.Function=func;
+  this.Scroll=scroll;
+}
+function HistoryPush(func){
+  var mainbox = document.getElementsByClassName("main")[0];
+  //container.scrollTop is always zero. why?
+  if(HistoryCurrentFunc){
+    History.push(new HistoryItem(HistoryCurrentFunc,mainbox.scrollTop));
+    var gobackdiv=document.getElementById("goback_div");
+    gobackdiv.setAttribute("class","");
+  }
+  HistoryCurrentFunc=func;
+}
+function HistoryPop(){
+  if(History.length > 0){
+    var his=History.pop();
+    HistoryCurrentItem=his.Function;
+    his.Function();
+    var mainbox = document.getElementsByClassName("main")[0];
+    mainbox.scrollTop=his.Scroll;
+    History.pop();
+  }
+  if(History.length==0){
+    var gobackdiv=document.getElementById("goback_div");
+    gobackdiv.setAttribute("class","goback_state_empty");
+  }
+}
+function ChangePlayStatePlay(){
+  var button=document.getElementById("control_button_play");
+  button.setAttribute("class","state_playing");
+}
+function ChangePlayStatePause(){
+  var button=document.getElementById("control_button_play");
+  button.setAttribute("class","state_pausing");
+}
+function ToggleLoop(){
+  LoopMode=(LoopMode+1)%4;
+  var button=document.getElementById("control_button_loop");
+  button.setAttribute("class","state_loop_"+LoopMode);
+}
+function SelectTab(id){
+  for(var key in document.getElementById("tab").childNodes){
     var elem=document.getElementById("tab").childNodes[key];
-    if(elem.tagName=="DIV"){
+    if(elem.tagName=="DIV"  && elem.id && elem.id!="goback_div"){
       elem.removeAttribute("class");
     }
   }
   document.getElementById(id).setAttribute("class","selected_tab");
 }
 function SelectSong(){
-  SelectTag("tab_song");
+  HistoryPush(SelectSong);
+  SelectTab("tab_song");
   var container = document.getElementById("container");
   ClearChild(container);
+  ClearChild(document.getElementById("song"));
   var songs=Song;
   songs.sort(SortSongs);
-  SetSongToTable(songs,[new SongInfoTable("#","Track"),new SongInfoTable("曲名","Title")
+  SetSongToTable(songs,[new SongInfoTable("#","Track"),new SongInfoTable("長さ","Length"),new SongInfoTable("曲名","Title")
     ,new SongInfoTable("アーティスト","ArtistName"),new SongInfoTable("アルバム","AlbumName")]);
 }
-function SelectArtist(){
-  SelectTag("tab_artist");
+function SelectPlaylist(){
+  if(Playlist==null){return;}
+  HistoryPush(SelectPlaylist);
+  SelectTab("tab_playlist");
   var container = document.getElementById("container");
   ClearChild(container);
-  ClearChild(document.getElementById("table_song"));
+  ClearChild(document.getElementById("song"));
+  var songs=Playlist;
+  songs.sort(SortSongs);
+  SetSongToTable(songs,[new SongInfoTable("#","Track"),new SongInfoTable("長さ","Length"),new SongInfoTable("曲名","Title")
+    ,new SongInfoTable("アーティスト","ArtistName"),new SongInfoTable("アルバム","AlbumName")]);
+}
+function SelectGenre(){
+  HistoryPush(SelectGenre);
+  SelectTab("tab_genre");
+  var container = document.getElementById("container");
+  ClearChild(container);
+  ClearChild(document.getElementById("song"));
+  var PushedGenre={};
+  for(var key in Album){
+    var genre=Album[key]["Genre"];
+    if(Album[key]["ThumbExist"]==1){
+      PushedGenre[genre]="thumb.cgi?id="+Album[key]["Id"];
+    }else if(! PushedGenre[genre]){
+      PushedGenre[genre]="img/cd.svg";
+    }
+  }
+  var tempList=[];
+  for(var key in PushedGenre){
+    tempList.push(key);
+  }
+  tempList.sort(function(a,b){if(a>b){return 1;}else{return -1;}});
+  for(var item in tempList){
+    var tempgenre=tempList[item];
+    tempgenre=tempgenre==""?"Other":tempgenre;
+    PushCardToContainer(container,tempgenre,"",PushedGenre[tempList[item]],"img/cd.svg",
+      (function(genre){return function(){ShowGenre(genre);}})(tempList[item]));
+  }
+}
+function SelectArtist(){
+  HistoryPush(SelectArtist);
+  SelectTab("tab_artist");
+  var container = document.getElementById("container");
+  ClearChild(container);
+  ClearChild(document.getElementById("song"));
   var PushedArtist={};
-  for(key in Album){
+  for(var key in Album){
     var artId=Album[key]["ArtistID"];
     PushedArtist[artId]=GetArtistById(artId);
   }
   var tempList=[];
-  for(key in PushedArtist){
+  for(var key in PushedArtist){
     tempList.push(PushedArtist[key]);
   }
   tempList.sort(function(a,b){if(a["Name"]>b["Name"]){return 1;}else{return -1;}});
-  for(item in tempList){
+  for(var item in tempList){
     var tempTitle="Unknown";
     if(! tempList[item]){tempTitle="Unkown";}
     else if(! tempList[item]["Name"]){tempTitle="Unkown";}
     else{tempTitle=tempList[item]["Name"];}
 
-    PushCardToContainer(container,tempTitle,"","sb.svg","",
+    PushCardToContainer(container,tempTitle,"",GetArtistThumb(tempList[item]["Id"]),"img/human.svg",
 //      (function(id){return function(id){ShowArtist(id);}})(tempList[item]["Id"]));
       (function(id){return function(){ShowArtist(id);}})(tempList[item]["Id"]));
 //      function(id){ShowArtist(tempList[item]["Id"]);});
@@ -187,17 +620,112 @@ function GetAlbumById(id){
   return Album[parseInt(id)-1];
 }
 
-function PlaySong(id){
+function PlaySong(num){
+  var progress = document.getElementById("controler_buttons");
+  progress.removeAttribute("class");
+  PlayingCnt=num;
+  Playlist=PlaylistDisplayed;
+  PlaySimple(PlayingCnt);
+}
+function PlayNextAutomatic(){
+  if(!Playlist){return;}
+  if(LoopMode == 0){
+    PlayNext();
+  }else if(LoopMode ==1){
+    PlayingCnt=(PlayingCnt+1)%Playlist.length;
+    PlaySimple(PlayingCnt);
+  }else if(LoopMode == 2){
+    PlayCurrent();
+  }else if(LoopMode == 3){
+    PlayNextRandom();
+  }
+}
+function PlayBackOperated(){
   var audio = document.getElementById("audio");
-  audio.src = "music.cgi?f=wav&id="+id;
+  if(audio.currentTime<5){PlayBack();}else{audio.currentTime=0;}
+}
+function PlayBack(){
+  if(PlayingCnt>0){
+    PlayingCnt--;
+    PlaySimple(PlayingCnt);
+  }
+}
+function PlayNextOperated(){
+  if(!Playlist){return;}
+  if(LoopMode == 0 || LoopMode == 1 || LoopMode ==2){
+    PlayingCnt=(PlayingCnt+1)%Playlist.length;
+    PlaySimple(PlayingCnt);
+  }else if(LoopMode == 3){
+    PlayNextRandom();
+  }
+}
+function PlayNextRandom(){
+  if(!Playlist){return;}
+  var current=PlayingCnt;
+  PlayingCnt=Math.floor(Math.random()*Playlist.length);
+  if(current==PlayingCnt){PlayingCnt=(PlayingCnt+1)%Playlist.length;}
+  PlaySimple(PlayingCnt);
+}
+function PlayNext(){
+  if(!Playlist){return;}
+  if(Playlist.length > PlayingCnt+1){
+    PlayingCnt++;
+    PlaySimple(PlayingCnt);
+  }
+}
+function Play(){
+  var audio = document.getElementById("audio");
+  if(! audio.src){return;}
+  if(audio.paused){
+    audio.play();
+  }else{
+    audio.pause();
+  }
+}
+function PlaySimple(num,from){
+  if(from){PlayOffset=from;}else{PlayOffset=0;}
+  var audio = document.getElementById("audio");
+  var currentsong=Playlist[num];
+  var mtlist={'.flac':'audio/flac','.wav':'audio/wav; codecs="1"','.mp3':'audio/mpeg'
+    ,'.ogg':'audio/ogg; codecs="vorbis"','.m4a':'audio/mp4; codecs="mp4a.40.2'};
+  UpdateSongStyle(currentsong["Id"]);
+
+  if(mtlist[currentsong["Format"]] && audio.canPlayType(mtlist[currentsong["Format"]])){
+    audio.src= GetAudioSource(currentsong,null,from);
+    PlayNative=true;
+    return;
+  }
+  PlayNative=false;
+  if(audio.canPlayType(mtlist[".wav"])){audio.src = GetAudioSource(currentsong,"wav",from);}
+  else if(audio.canPlayType(mtlist[".ogg"])){audio.src = GetAudioSource(currentsong,"ogg",from);}
+  else if(audio.canPlayType(mtlist[".m4a"])){audio.src = GetAudioSource(currentsong,"m4a",from);}
+  else if(audio.canPlayType(mtlist[".mp3"])){audio.src = GetAudioSource(currentsong,"mp3",from);}
+}
+function GetAudioSource(currentsong,f,from){
+  var result="music.cgi?id="+currentsong["Id"];
+  if(f){
+    result=result+"&f="+f;
+  }
+  if(from){
+    result=result+"&from="+from;
+  }
+  return result;
+}
+function PlayCurrent(){
+  var audio = document.getElementById("audio");
+  audio.play();
+}
+function SeekOnServer(from){
+  PlaySimple(PlayingCnt,from);
 }
 function SelectAlbum(){
-  SelectTag("tab_album");
+  HistoryPush(SelectAlbum);
+  SelectTab("tab_album");
   var container = document.getElementById("container");
   ClearChild(container);
-  ClearChild(document.getElementById("table_song"));
+  ClearChild(document.getElementById("song"));
   var tempList=[];
-  for(key in Album){
+  for(var key in Album){
     tempList.push(Album[key]);
   }
   tempList.sort(function(a,b){
@@ -210,10 +738,19 @@ function SelectAlbum(){
     }else{
       return -1;}
     });
-  for(item in tempList){
-    PushCardToContainer(container,tempList[item]["Title"],GetArtistById(tempList[item]["ArtistID"])["Name"],"thumb.cgi?id="+tempList[item]["Id"],"sb.svg",
+  for(var item in tempList){
+    var crtitem=tempList[item];
+    PushCardToContainer(container,crtitem["Title"],GetArtistById(crtitem["ArtistID"])["Name"],(crtitem["ThumbExist"]==0?"img/cd.svg": "thumb.cgi?id="+crtitem["Id"]),"img/cd.svg",
       (function(id){return function(){ShowAlbum(id);}})(tempList[item]["Id"]));
   }
+}
+function GetArtistThumb(artistid){
+  for(var key in Album){
+    if(Album[key]["ArtistID"]==artistid && Album[key]["ThumbExist"] == 1){
+      return  "thumb.cgi?id="+Album[key]["Id"];
+    }
+  }
+  return "img/human.svg";
 }
 function SortSongs(a,b){
   var albuma=GetAlbumById(a["AlbumId"]);
@@ -233,87 +770,135 @@ function SortSongs(a,b){
     }
   }
 }
+function ShowGenre(genre){
+  HistoryPush(
+    (function(g){return function(){ShowGenre(g);}})(genre));
+  SelectTab("tab_genre");
+  var container = document.getElementById("container");
+  ClearChild(container);
+  ClearChild(document.getElementById("song"));
+  var tempList=[];
+  for(var key in Album){
+    if(Album[key]["Genre"] == genre){
+      tempList.push(Album[key]);
+    }
+  }
+  tempList.sort(function(a,b){if(a["Title"]>b["Title"]){return 1;}else{return -1;}});
+  for(var item in tempList){
+    var crtitem=tempList[item];
+    PushCardToContainer(container,crtitem["Title"],genre,(crtitem["ThumbExist"]==0?"img/cd.svg": "thumb.cgi?id="+crtitem["Id"]),"img/cd.svg"
+      ,(function(id){return function(){ShowAlbum(id);}})(crtitem["Id"]));
+  }
+  var tempListS=[];
+  for(var key in Song){
+    if(GetAlbumById(Song[key]["AlbumId"])["Genre"]== genre){
+      tempListS.push(Song[key]);
+    }
+  }
+  tempListS.sort(SortSongs);
+  SetSongToTable(tempListS,[new SongInfoTable("番号","Track"),new SongInfoTable("長さ","Length"),new SongInfoTable("曲名","Title"),new SongInfoTable("アルバム","AlbumName")]);
+}
 function ShowArtist(artistid){
-  SelectTag("tab_result");
+  HistoryPush(
+    (function(id){return function(){ShowArtist(id);}})(artistid));
+
+//  SelectTab("tab_result");
+  SelectTab("tab_artist");
   var artist=GetArtistById(artistid);
   var container = document.getElementById("container");
   ClearChild(container);
-  ClearChild(document.getElementById("table_song"));
+  ClearChild(document.getElementById("song"));
   var tempList=[];
-  for(key in Album){
+  for(var key in Album){
     if(Album[key]["ArtistID"] == artistid){
       tempList.push(Album[key]);
     }
   }
   tempList.sort(function(a,b){if(a["Title"]>b["Title"]){return 1;}else{return -1;}});
-  for(item in tempList){
-    PushCardToContainer(container,tempList[item]["Title"],artist["Name"],"thumb.cgi?id="+tempList[item]["Id"],"sb.svg"
-      ,(function(id){return function(){ShowAlbum(id);}})(tempList[item]["Id"]));
+  for(var item in tempList){
+    var crtitem=tempList[item];
+    PushCardToContainer(container,crtitem["Title"],artist["Name"],(crtitem["ThumbExist"]==0?"img/cd.svg": "thumb.cgi?id="+crtitem["Id"]),"img/cd.svg"
+      ,(function(id){return function(){ShowAlbum(id);}})(crtitem["Id"]));
   }
   var tempListS=[];
-  for(key in Song){
+  for(var key in Song){
     if(Song[key]["ArtistID"] == artistid || GetAlbumById(Song[key]["AlbumId"])["ArtistID"]== artistid){
       tempListS.push(Song[key]);
     }
   }
   tempListS.sort(SortSongs);
-  SetSongToTable(tempListS,[new SongInfoTable("番号","Track"),new SongInfoTable("曲名","Title")]);
+  SetSongToTable(tempListS,[new SongInfoTable("番号","Track"),new SongInfoTable("長さ","Length"),new SongInfoTable("曲名","Title"),new SongInfoTable("アルバム","AlbumName")]);
 }
 function ShowAlbum(albumid){
-  SelectTag("tab_result");
+  HistoryPush(
+    (function(id){return function(){ShowAlbum(id);}})(albumid));
+//  SelectTab("tab_result");
+  SelectTab("tab_album");
   var tempAlbum=GetAlbumById(albumid);
   var container = document.getElementById("container");
   ClearChild(container);
-  ClearChild(document.getElementById("table_song"));
-  PushCardToContainer(container,tempAlbum["Title"],"","thumb.cgi?id="+tempAlbum["Id"],"sb.svg");
+  ClearChild(document.getElementById("song"));
+  PushCardToContainer(container,tempAlbum["Title"],"",(tempAlbum["ThumbExist"]==0?"img/cd.svg": "thumb.cgi?id="+tempAlbum["Id"]),"img/cd.svg");
   var tempListS=[];
-  for(key in Song){
+  for(var key in Song){
     if(Song[key]["AlbumId"] == albumid){
       tempListS.push(Song[key]);
     }
   }
   tempListS.sort(SortSongs);
-  SetSongToTable(tempListS,[new SongInfoTable("番号","Track"),new SongInfoTable("曲名","Title")]);
+  SetSongToTable(tempListS,[new SongInfoTable("番号","Track"),new SongInfoTable("長さ","Length"),new SongInfoTable("曲名","Title")]);
 }
 function ClearChild(container){
+  var mainbox = document.getElementsByClassName("main")[0];
+  mainbox.scrollTop=0;
   while(container.hasChildNodes()){container.removeChild(container.lastChild);}
 }
 function SetSongToTable(songs,infos){
-  var table=document.getElementById("table_song");
+  PlaylistDisplayed=songs;
+  var song=document.getElementById("song");
+  var table = document.createElement("table");
+  table.setAttribute("class","table_song");
+  table=song.appendChild(table);
   ClearChild(table);
   var tr=document.createElement("tr");
   //tr.appendChild(document.createElement("th"));
-  for(key2 in infos){
+  for(var key2 in infos){
     var th=document.createElement("th");
     th.innerText=infos[key2].head;
     tr.appendChild(th);
   }
   table.appendChild(tr);
-  for(key in songs){
+  var cnt=0;
+  for(var key in songs){
     var tr=document.createElement("tr");
-/*
-    var td=document.createElement("td");
-    var button=document.createElement("button");
-    button.innerText="再生";
-    //var func=(function(id){return function(){PlaySong(id);}})(songs[key]["Id"]);
-    button.setAttribute("onclick","PlaySong("+songs[key]["Id"]+")");
-    td.appendChild(button);
-    tr.appendChild(td);*/
-
     var songsInfo=songs[key];
+    tr.setAttribute("class","table_song_"+songsInfo["Id"]);
     songsInfo["ArtistName"]=GetArtistById(songsInfo["ArtistID"])["Name"];
     var albumInfo=GetAlbumById(songsInfo["AlbumId"]);
     songsInfo["AlbumName"]=albumInfo["Title"];
     songsInfo["AlbumTrack"]=albumInfo["Tracks"];
     songsInfo["AlbumArtist"]=GetArtistById(albumInfo["ArtistID"])["Name"];
-    for(key2 in infos){
+    var duration=parseFloat(songsInfo["Duration"]);
+    songsInfo["Length"]=GetTimeText(duration);
+    for(var key2 in infos){
       var td=document.createElement("td");
       td.innerText=songs[key][infos[key2].key];
       tr.appendChild(td);
     }
-    tr.setAttribute("onclick","PlaySong("+songs[key]["Id"]+")");
+    tr.setAttribute("onclick","PlaySong("+cnt+")");
     table.appendChild(tr);
+    cnt++;
   }
+}
+function GetTimeText(duration){
+  var h=Math.floor(duration/3600);
+  var m=(Math.floor(duration/60)%60);
+  var s=(Math.floor(duration)%60);
+  var mt=('00'+m).slice(-2);
+  var st=('00'+s).slice(-2);
+  if(h!=0){return h+":"+mt+":"+st;}
+  else if(m!=0){return mt+":"+st;}
+  else{return s+"sec";}
 }
 function SongInfoTable(head,key){
   this.head=head;

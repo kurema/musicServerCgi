@@ -19,7 +19,7 @@ my @pathInfo = split("/", substr($q->path_info(),1));
 print "Content-Type: application/json;charset=utf-8;\n\n";
 
 if($pathInfo[0] eq "album"){
-my %hash=("id"=>"Id","title"=>"Title","artistid"=>"ArtistID","tracks"=>"Tracks");
+my %hash=("id"=>"Id","title"=>"Title","artistid"=>"ArtistID","tracks"=>"Tracks","thumbexist"=>"ThumbExist","genre"=>"Genre");
 if($pathInfo[1] eq "artist"){
 OutputJson($pathInfo[2],$dbh,\%hash,"album","artistid");
 }else{
@@ -75,6 +75,7 @@ print " \"".$jsonKey{$key}."\" : \"".EscapeJson($info->{$key})."\"";
 }
 print "\n}";
 }
+$sth->finish;
 print "\n]";
 }
 

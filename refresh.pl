@@ -16,7 +16,7 @@ require "commonm.pl";
 my %conf=GetConf(File::Spec->catfile(dirname(__FILE__),"music.conf"));
 my $music_exts=$conf{"musicexts"};
 
-my $dbh = DBI->connect("dbi:SQLite:dbname=".$conf{"sqlitedb"});
+my $dbh = DBI->connect("dbi:SQLite:dbname=".$conf{"sqlitedb"},undef,undef,{AutoCommit => 0});
 
 $dbh->{sqlite_unicode} = 1;
 #$dbh->do("set names utf8");
@@ -25,8 +25,7 @@ $dbh->do("drop table album;");
 $dbh->do("drop table song;");
 $dbh->do("drop table artist;");
 
-
-$dbh->do("create table album(id,filename,title,artistid,tracks,genre);");
+$dbh->do("create table album(id,filename,title,artistid,tracks,genre,thumbexist);");
 $dbh->do("create table song(id,filename,albumid,track,title,format,artistid,duration);");
 $dbh->do("create table artist(id,name);");
 
@@ -36,6 +35,27 @@ my $albumID=0;
 my %artistIDs;
 my $artistID=0;
 find(\&processFile,$conf{"songhome"});
+
+my $sth=$dbh->prepare("select * from album");
+$sth->execute;
+
+while(my $info=$sth->fetchrow_hashref()){
+if($info->{"filename"} eq ""){next;}
+$dbh->do("update album set thumbexist=0 where id =".$info->{"id"}.";");
+my @files=glob('"'.File::Spec->catfile($info->{"filename"},"*").'"');
+my $minsize=$conf{"thumbmax"};
+foreach my $file (@files){
+my ($ext) = $file=~ m/(\.[^\.]+$)/;
+if(index($conf{"thumbexts"},$ext)>=0){
+if((-s $file)<$minsize){
+$dbh->do("update album set thumbexist=1 where id =".$info->{"id"}.";");
+last;
+}
+}
+}
+}
+
+$dbh->commit;
 $dbh->disconnect;
 
 sub processFile{
@@ -58,13 +78,13 @@ if($albumartist eq ""){$albumartist=$artist;}
 my $albumIDTemp=0;
 if(defined($albumIDs{$album})){$albumIDTemp=$albumIDs{$album};}else{
 $albumID++;
-$dbh->do(("insert into album(id,filename,title,artistid,tracks,genre) values($albumID,'".escape_sql(decode_utf8($File::Find::dir))."','".escape_sql($album)."',".getArtistId($albumartist).",'".escape_sql($albumtrack)."','".escape_sql($genre)."');"));
+$dbh->do("insert into album(id,filename,title,artistid,tracks,genre,thumbexist) values($albumID,'".escape_sql(decode_utf8($File::Find::dir))."','".escape_sql($album)."',".getArtistId($albumartist).",'".escape_sql($albumtrack)."','".escape_sql($genre)."',-1);");
 $albumIDs{$album}=$albumID;
 $albumIDTemp=$albumID;
 print "album:$album by $albumartistf\n";
 }
 
-$dbh->do(("insert into song (id,filename,albumid,track,title,format,artistid,duration) values($id,'".escape_sql(decode_utf8($file))."',$albumIDTemp,".escape_sql($track).",'".escape_sql($songtitle)."','".escape_sql($ext)."',".getArtistId($artist).",'".$songinfo->{"format"}->{"duration"}."');"));
+$dbh->do("insert into song (id,filename,albumid,track,title,format,artistid,duration) values($id,'".escape_sql(decode_utf8($file))."',$albumIDTemp,".escape_sql($track).",'".escape_sql($songtitle)."','".escape_sql($ext)."',".getArtistId($artist).",'".$songinfo->{"format"}->{"duration"}."');");
 $id++;
 print "$track. $songtitle by $artist\n";
 }
