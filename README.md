@@ -15,16 +15,11 @@ Vivaldiのキャプチャを使っているのでシャドウが消えていま�
 色を変えたい場合はsvg画像も変更が必要です。
 
 ## Translate
-To switch to English UI, change
-```index.html
-// Change here to localize;
-var localization=localization_ja;```
-to
-```index.html
-// Change here to localize;
-var localization=localization_en;```
+To switch to English UI,  go "設定" page, configure and reload.
 
-Other languages can be supported by adding another translation.
+You can set dafault language by changing ``var DefaultLanguage="ja";`` line.
+
+Other languages can be supported by adding another translations.
 
 cf.
 

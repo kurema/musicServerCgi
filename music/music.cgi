@@ -26,31 +26,49 @@ $dbh->disconnect;
 
 my $from=$q->param('from');
 my $format=$q->param('f');
+my ($kbps)= $q->param('kbps')=~ m/(\d+)/;
+
 if($format eq "" || ! defined($format)){
 TransferFile($info[1]);
 }else{
 if($format eq "wav"){
-TranscodeFile($info[1],"wav","audio/wav",$from);
+TranscodeFile($info[1],"wav","pcm_s16le","audio/wav",$from);
 }elsif($format eq "mp3"){
-TranscodeFile($info[1],"mp3","audio/mp3",$from);
+TranscodeFile($info[1],"mp3","libmp3lame","audio/mp3",$from,$kbps);
 }elsif($format eq "ogg"){
-TranscodeFile($info[1],"ogg","audio/ogg",$from);
+TranscodeFile($info[1],"ogg","libvorbis","audio/ogg",$from,$kbps);
 }elsif($format eq "m4a"){
-TranscodeFile($info[1],"m4a","audio/m4a",$from);
+TranscodeFile($info[1],"m4a","libfaac","audio/m4a",$from,$kbps);
 }
 }
 
 sub TranscodeFile{
-my ($file,$ext,$mimetype,$from)=@_;
+my ($file,$ext,$acodec,$mimetype,$from,$kbps)=@_;
 my $option="";
+my $option2="";
 if($from ne "" && defined($from)){
   if($from=~ m/(\d+\.?\d*)/){
     $option.="-ss ".$1." ";
   }
 }
+if(defined($kbps) && $kbps ne ""){
+  $option2.="-ab ".$kbps."k ";
+}
+my $command="ffmpeg $option -i \"".EscapeShell($file)."\" -vn $option2 -acodec $acodec -loglevel quiet pipe:1.$ext";
+#print $command;exit;
 print "Content-Type: $mimetype\n\n";
-open AUDIO,"ffmpeg $option -i \"$file\" -loglevel quiet pipe:1.$ext|";
+open AUDIO,"$command|";
+binmode(AUDIO);
 while (read AUDIO, my $buffer, 4096){
 print $buffer;
 }
+}
+
+sub EscapeShell{
+my $word=$_[0];
+$word=~ s/\\/\\\\/g;
+$word=~ s/\$/\\\$/g;
+$word=~ s/\`/\\\`/g;
+$word=~ s/\"/\\\"/g;
+return $word;
 }
