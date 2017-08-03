@@ -99,10 +99,10 @@ div.tab div.selected_tab{
 font-weight:800;
 border-bottom:2px solid #ff5722;
 }
-#tab_result{
+#tab_result,#tab_playlist{
 display:none;
 }
-#tab_result.selected_tab{
+#tab_result.selected_tab,#tab_playlist.selected_tab{
 display:inherit;
 }
 .not_displayed{
@@ -576,7 +576,7 @@ document.write("<option value='"+key+"'>"+localizations[key]["language_name"])+"
 </div>
 </div>
 </div>
-<img src="img/volume2.svg" style="height:30px;" />
+<img src="img/volume2.svg" style="height:30px;" onclick="SetVolume(1.0);" />
 </div>
 </div>
 </div>
@@ -646,8 +646,13 @@ function UpdateSongStyle(id){
 
 function SliderClickVolumeMute(){
   var audio = document.getElementById("audio");
-  audio.volume=0;
-  Volume=0;
+  audio.muted=!audio.muted;
+  UpdateVolumeDisplay();
+}
+function SetVolume(vol){
+  var audio = document.getElementById("audio");
+  Volume=vol;
+  audio.volume=Volume;
   UpdateVolumeDisplay();
 }
 function SliderClickVolume(from,event){
@@ -700,7 +705,9 @@ function VolumeChange(){
 }
 function UpdateVolumeDisplay(){
   var progress = document.getElementById("progress1_volume");
-  progress.style="transform: scaleX("+Volume+");";
+  var audio = document.getElementById("audio");
+  var vol=audio.muted?0:Volume;
+  progress.style="transform: scaleX("+vol+");";
   localStorage.setItem("music_cgi_volume",Volume);
 }
 function GetCurrentRate(){
@@ -954,6 +961,7 @@ function PlaySimple(num,from){
     audio.src= GetAudioSource(currentsong,null,from);
     PlayNative=true;
     audio.volume=Volume;
+    PlayOffset=0;
     return;
   }
   PlayNative=false;
