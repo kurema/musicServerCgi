@@ -472,9 +472,9 @@ align-items: center;
 <body>
 
 <div id="tab" class="tab">
-<div onclick="HistoryPop();" id="goback_div" class="goback_state_empty">
+<!--<div onclick="history.go(-1);" id="goback_div" class="goback_state_empty">
 <img src="img/goback.svg" />
-</div>
+</div>-->
 <div id="tab_artist" onClick="SelectArtist()">
 <p><script>document.write(localization.tab_artist);</script></p>
 </div>
@@ -726,25 +726,49 @@ function HistoryPush(func){
   var mainbox = document.getElementsByClassName("main")[0];
   //container.scrollTop is always zero. why?
   if(HistoryCurrentFunc){
-    History.push(new HistoryItem(HistoryCurrentFunc,mainbox.scrollTop));
-    var gobackdiv=document.getElementById("goback_div");
-    gobackdiv.setAttribute("class","");
+    var hisItem=new HistoryItem(HistoryCurrentFunc,mainbox.scrollTop);
+    //while(History.length>CurrentState){History.pop();}
+    History.push(hisItem);
+    //var gobackdiv=document.getElementById("goback_div");
+    //gobackdiv.setAttribute("class","");
+    if(!OnBack){history.pushState(0, null, null);
+    //CurrentState++;
+    }
   }
   HistoryCurrentFunc=func;
 }
-function HistoryPop(){
+window.addEventListener("popstate", function(event) {HistoryPop(event);});
+var OnBack=false;
+//var CurrentState=0;
+//var HistoryAll=[];
+function HistoryPopNatural(event){
+console.log(event.state);
+  var his=event.state;
+  HistoryCurrentItem=his.Function;
+  OnBack=true;
+  his.Function();
+  OnBack=false;
+  var mainbox = document.getElementsByClassName("main")[0];
+  mainbox.scrollTop=his.Scroll;
+}
+function HistoryPop(event){
   if(History.length > 0){
     var his=History.pop();
+    //var his=History[cnt];
     HistoryCurrentItem=his.Function;
+    OnBack=true;
     his.Function();
+    OnBack=false;
     var mainbox = document.getElementsByClassName("main")[0];
     mainbox.scrollTop=his.Scroll;
     History.pop();
   }
+/*
   if(History.length==0){
     var gobackdiv=document.getElementById("goback_div");
     gobackdiv.setAttribute("class","goback_state_empty");
   }
+*/
 }
 function ChangePlayStatePlay(){
   var button=document.getElementById("control_button_play");
