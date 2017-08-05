@@ -587,8 +587,6 @@ var PlaylistDisplayed;
 var Playlist;
 var PlayingCnt=-1;
 var LoopMode=0;//0:なし。1:全体繰り返し。2:同曲繰り返し。3:シャッフル。
-var History=[];
-var HistoryCurrentFunc;
 var InitDone;
 var PlayNative;
 var PlayOffset;
@@ -603,6 +601,9 @@ AppendStyle();
 var Kbps=localStorage.getItem("music_cgi_kbps")?parseInt(localStorage.getItem("music_cgi_kbps")):128;;
 var Format=localStorage.getItem("music_cgi_format")?localStorage.getItem("music_cgi_format"):"";
 UpdateForm();
+
+window.addEventListener("popstate", function(event) {HistoryPop(event);});
+var OnBack=false;
 
 function UpdateForm(){
   document.forms.settingForm.lang.value=Language;
@@ -630,10 +631,6 @@ window.addEventListener("beforeunload", function (e) {
   return confirmationMessage;
 });
 function AppendStyle(){
-/*
-  var blankStyle = document.createElement('style');
-  blankStyle.type = "text/css";
-  NewStyleSheet = document.getElementsByTagName('head').item(0).appendChild(blankStyle);*/
   document.styleSheets[0].insertRule("tr.table_song_-1{}",0);
 }
 function UpdateSongStyle(id){
@@ -730,63 +727,25 @@ function GetFuncFromKey(key){
 }
 function HistoryPush(func,arg){
   var mainbox = document.getElementsByClassName("main")[0];
-  //container.scrollTop is always zero. why?
-//  if(HistoryCurrentFunc){
-  
-  if(true){
-    //var hisItem=new HistoryItem(HistoryCurrentFunc,mainbox.scrollTop,HistoryCurrentArg);
-    var hisItem=new HistoryItem(func,mainbox.scrollTop,arg);
-    //while(History.length>CurrentState){History.pop();}
-    History.push(hisItem);
-    //var gobackdiv=document.getElementById("goback_div");
-    //gobackdiv.setAttribute("class","");
-    if(!OnBack){
-      if(history.state){
-        history.pushState(hisItem, null, null);
-      }else{
-        history.replaceState(hisItem, null, null);
-      }
-    //CurrentState++;
+  var hisItem=new HistoryItem(func,mainbox.scrollTop,arg);
+  if(!OnBack){
+    if(history.state){
+      history.pushState(hisItem, null, null);
+    }else{
+      history.replaceState(hisItem, null, null);
     }
   }
-  //HistoryCurrentFunc=func;
-  //HistoryCurrentArg=arg;
-}
-window.addEventListener("popstate", function(event) {HistoryPop(event);});
-var OnBack=false;
-var HistoryCurrentArg=null;
-function HistoryPopNatural(event){
-console.log(event.state);
-  var his=event.state;
-  HistoryCurrentItem=his.Function;
-  OnBack=true;
-  ExecuteHistoryItem(his);
-//  his.Function();
-  OnBack=false;
-  var mainbox = document.getElementsByClassName("main")[0];
-  mainbox.scrollTop=his.Scroll;
 }
 function HistoryPop(event){
-//  if(History.length > 0){
-  if(true){
-    var his=event.state;
-    //var his=History.pop();
-    //var his=History[cnt];
+  var his=event.state;
+  if(his){
     HistoryCurrentItem=his.Function;
     OnBack=true;
     ExecuteHistoryItem(his);
-    //his.Function();
     OnBack=false;
     var mainbox = document.getElementsByClassName("main")[0];
     mainbox.scrollTop=his.Scroll;
-    History.pop();
   }
-/*
-  if(History.length==0){
-    var gobackdiv=document.getElementById("goback_div");
-    gobackdiv.setAttribute("class","goback_state_empty");
-  }
-*/
 }
 function ChangePlayStatePlay(){
   var button=document.getElementById("control_button_play");
@@ -1105,8 +1064,6 @@ function SortSongs(a,b){
 }
 function ShowGenre(genre){
   HistoryPush("ShowGenre",genre);
-//  HistoryPush(
-//    (function(g){return function(){ShowGenre(g);}})(genre));
   SelectTab("tab_genre");
   var container = document.getElementById("container");
   ClearMain();
@@ -1134,10 +1091,6 @@ function ShowGenre(genre){
 }
 function ShowArtist(artistid){
   HistoryPush("ShowArtist",artistid);
-//  HistoryPush(
-//    (function(id){return function(){ShowArtist(id);}})(artistid));
-
-//  SelectTab("tab_result");
   SelectTab("tab_artist");
   var artist=GetArtistById(artistid);
   var container = document.getElementById("container");
@@ -1166,9 +1119,6 @@ function ShowArtist(artistid){
 }
 function ShowAlbum(albumid){
   HistoryPush("ShowAlbum",albumid);
-//  HistoryPush(
-//    (function(id){return function(){ShowAlbum(id);}})(albumid));
-//  SelectTab("tab_result");
   SelectTab("tab_album");
   var tempAlbum=GetAlbumById(albumid);
   var container = document.getElementById("container");
