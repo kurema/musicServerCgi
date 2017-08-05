@@ -472,9 +472,6 @@ align-items: center;
 <body>
 
 <div id="tab" class="tab">
-<!--<div onclick="history.go(-1);" id="goback_div" class="goback_state_empty">
-<img src="img/goback.svg" />
-</div>-->
 <div id="tab_artist" onClick="SelectArtist()">
 <p><script>document.write(localization.tab_artist);</script></p>
 </div>
@@ -718,46 +715,67 @@ function GetCurrentRate(){
     return 0;
   }
 }
-function HistoryItem(func,scroll){
+function HistoryItem(func,scroll,arg){
   this.Function=func;
   this.Scroll=scroll;
+  this.Argument=arg;
 }
-function HistoryPush(func){
+function ExecuteHistoryItem(history){
+  var func=GetFuncFromKey(history.Function);
+  if(history.Argument){func(history.Argument);}else{func();}
+}
+function GetFuncFromKey(key){
+  var funcs={"SelectSetting":SelectSetting,"SelectSong":SelectSong,"SelectPlaylist":SelectPlaylist,"SelectGenre":SelectGenre,"SelectArtist":SelectArtist,"ShowGenre":ShowGenre,"ShowArtist":ShowArtist,"ShowAlbum":ShowAlbum};
+  return funcs[key];
+}
+function HistoryPush(func,arg){
   var mainbox = document.getElementsByClassName("main")[0];
   //container.scrollTop is always zero. why?
-  if(HistoryCurrentFunc){
-    var hisItem=new HistoryItem(HistoryCurrentFunc,mainbox.scrollTop);
+//  if(HistoryCurrentFunc){
+  
+  if(true){
+    //var hisItem=new HistoryItem(HistoryCurrentFunc,mainbox.scrollTop,HistoryCurrentArg);
+    var hisItem=new HistoryItem(func,mainbox.scrollTop,arg);
     //while(History.length>CurrentState){History.pop();}
     History.push(hisItem);
     //var gobackdiv=document.getElementById("goback_div");
     //gobackdiv.setAttribute("class","");
-    if(!OnBack){history.pushState(0, null, null);
+    if(!OnBack){
+      if(history.state){
+        history.pushState(hisItem, null, null);
+      }else{
+        history.replaceState(hisItem, null, null);
+      }
     //CurrentState++;
     }
   }
-  HistoryCurrentFunc=func;
+  //HistoryCurrentFunc=func;
+  //HistoryCurrentArg=arg;
 }
 window.addEventListener("popstate", function(event) {HistoryPop(event);});
 var OnBack=false;
-//var CurrentState=0;
-//var HistoryAll=[];
+var HistoryCurrentArg=null;
 function HistoryPopNatural(event){
 console.log(event.state);
   var his=event.state;
   HistoryCurrentItem=his.Function;
   OnBack=true;
-  his.Function();
+  ExecuteHistoryItem(his);
+//  his.Function();
   OnBack=false;
   var mainbox = document.getElementsByClassName("main")[0];
   mainbox.scrollTop=his.Scroll;
 }
 function HistoryPop(event){
-  if(History.length > 0){
-    var his=History.pop();
+//  if(History.length > 0){
+  if(true){
+    var his=event.state;
+    //var his=History.pop();
     //var his=History[cnt];
     HistoryCurrentItem=his.Function;
     OnBack=true;
-    his.Function();
+    ExecuteHistoryItem(his);
+    //his.Function();
     OnBack=false;
     var mainbox = document.getElementsByClassName("main")[0];
     mainbox.scrollTop=his.Scroll;
@@ -796,7 +814,7 @@ function HideSetting(){
   document.getElementById("setting").setAttribute("class","not_displayed");
 }
 function SelectSetting(){
-  HistoryPush(SelectSetting);
+  HistoryPush("SelectSetting");
   SelectTab("tab_setting");
   ClearMain();
   var container = document.getElementById("container");
@@ -809,7 +827,7 @@ function ClearMain(){
   HideSetting();
 }
 function SelectSong(){
-  HistoryPush(SelectSong);
+  HistoryPush("SelectSong");
   SelectTab("tab_song");
   var container = document.getElementById("container");
   ClearMain();
@@ -821,7 +839,7 @@ function SelectSong(){
 }
 function SelectPlaylist(){
   if(Playlist==null){return;}
-  HistoryPush(SelectPlaylist);
+  HistoryPush("SelectPlaylist");
   SelectTab("tab_playlist");
   var container = document.getElementById("container");
   ClearMain();
@@ -832,7 +850,7 @@ function SelectPlaylist(){
     ,new SongInfoTable(localization.table_song_artist,"ArtistName"),new SongInfoTable(localization.table_album_title,"AlbumName")]);
 }
 function SelectGenre(){
-  HistoryPush(SelectGenre);
+  HistoryPush("SelectGenre");
   SelectTab("tab_genre");
   var container = document.getElementById("container");
   ClearMain();
@@ -859,7 +877,7 @@ function SelectGenre(){
   }
 }
 function SelectArtist(){
-  HistoryPush(SelectArtist);
+  HistoryPush("SelectArtist");
   SelectTab("tab_artist");
   var container = document.getElementById("container");
   ClearMain();
@@ -1031,7 +1049,7 @@ function SeekOnServer(from){
   PlaySimple(PlayingCnt,from);
 }
 function SelectAlbum(){
-  HistoryPush(SelectAlbum);
+  HistoryPush("SelectAlbum");
   SelectTab("tab_album");
   var container = document.getElementById("container");
   ClearMain();
@@ -1086,8 +1104,9 @@ function SortSongs(a,b){
   }
 }
 function ShowGenre(genre){
-  HistoryPush(
-    (function(g){return function(){ShowGenre(g);}})(genre));
+  HistoryPush("ShowGenre",genre);
+//  HistoryPush(
+//    (function(g){return function(){ShowGenre(g);}})(genre));
   SelectTab("tab_genre");
   var container = document.getElementById("container");
   ClearMain();
@@ -1114,8 +1133,9 @@ function ShowGenre(genre){
   SetSongToTable(tempListS,[new SongInfoTable(localization.table_track,"Track"),new SongInfoTable(localization.table_length,"Length"),new SongInfoTable(localization.table_song_title,"Title"),new SongInfoTable(localization.table_album_artist,"ArtistName"),new SongInfoTable(localization.table_album_title,"AlbumName")]);
 }
 function ShowArtist(artistid){
-  HistoryPush(
-    (function(id){return function(){ShowArtist(id);}})(artistid));
+  HistoryPush("ShowArtist",artistid);
+//  HistoryPush(
+//    (function(id){return function(){ShowArtist(id);}})(artistid));
 
 //  SelectTab("tab_result");
   SelectTab("tab_artist");
@@ -1145,8 +1165,9 @@ function ShowArtist(artistid){
   SetSongToTable(tempListS,[new SongInfoTable(localization.table_track,"Track"),new SongInfoTable(localization.table_length,"Length"),new SongInfoTable(localization.table_song_title,"Title"),new SongInfoTable(localization.table_album_title,"AlbumName") ,new SongInfoTable(localization.table_song_artist,"ArtistName")]);
 }
 function ShowAlbum(albumid){
-  HistoryPush(
-    (function(id){return function(){ShowAlbum(id);}})(albumid));
+  HistoryPush("ShowAlbum",albumid);
+//  HistoryPush(
+//    (function(id){return function(){ShowAlbum(id);}})(albumid));
 //  SelectTab("tab_result");
   SelectTab("tab_album");
   var tempAlbum=GetAlbumById(albumid);
