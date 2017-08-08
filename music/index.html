@@ -727,9 +727,12 @@ function GetFuncFromKey(key){
 }
 function HistoryPush(func,arg){
   var mainbox = document.getElementsByClassName("main")[0];
-  var hisItem=new HistoryItem(func,mainbox.scrollTop,arg);
+  var hisItem=new HistoryItem(func,0,arg);
   if(!OnBack){
     if(history.state){
+      var state=history.state;
+      state.Scroll=mainbox.scrollTop;
+      history.replaceState(state,null,null);
       history.pushState(hisItem, null, null);
     }else{
       history.replaceState(hisItem, null, null);
