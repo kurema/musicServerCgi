@@ -15,5 +15,14 @@
  "Title" : "Mute",
  "Id" : "1",
  "AlbumId" : "1"
+},
+{
+ "Format" : ".wav",
+ "ArtistID" : "2",
+ "Duration" : "5.0",
+ "Track" : "1",
+ "Title" : "No sound",
+ "Id" : "2",
+ "AlbumId" : "2"
 }
 ]
