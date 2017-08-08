@@ -3,6 +3,9 @@ cgiで作った音楽サーバーです。
 ブラウザが非対応な形式でもトランスコードで配信します。  
 イントラサーバーとしての利用を想定しています。
 
+## Demo
+[Demo](https://kurema.github.io/musicServerCgi/)
+
 ## スクリーンショット
 ![PC](screenshot/pc07.png)
 ![PC](screenshot/pc10.png)
