@@ -821,7 +821,7 @@ function SelectGenre(){
   for(var key in Album){
     var genre=Album[key]["Genre"];
     if(Album[key]["ThumbExist"]==1){
-      PushedGenre[genre]="thumbs/"+Album[key]["Id"];
+      PushedGenre[genre]="thumbs/"+Album[key]["Id"]+".png";
     }else if(! PushedGenre[genre]){
       PushedGenre[genre]="img/cd.svg";
     }
@@ -1037,12 +1037,12 @@ function SelectAlbum(){
   }
 }
 function GetAlbumThumb(album){
-  return album["ThumbExist"]==0?"img/cd.svg": "thumbs/"+album["Id"];
+  return album["ThumbExist"]==0?"img/cd.svg": "thumbs/"+album["Id"]+".png";
 }
 function GetArtistThumb(artistid){
   for(var key in Album){
     if(Album[key]["ArtistID"]==artistid && Album[key]["ThumbExist"] == 1){
-      return  "thumbs/"+Album[key]["Id"];
+      return  "thumbs/"+Album[key]["Id"]+".png";
     }
   }
   return "img/human.svg";
@@ -1080,7 +1080,7 @@ function ShowGenre(genre){
   tempList.sort(function(a,b){if(a["Title"]>b["Title"]){return 1;}else{return -1;}});
   for(var item in tempList){
     var crtitem=tempList[item];
-    PushCardToContainer(container,crtitem["Title"],genre,(crtitem["ThumbExist"]==0?"img/cd.svg": "thumbs/"+crtitem["Id"]),"img/cd.svg"
+    PushCardToContainer(container,crtitem["Title"],genre,(crtitem["ThumbExist"]==0?"img/cd.svg": "thumbs/"+crtitem["Id"]+".png"),"img/cd.svg"
       ,(function(id){return function(){ShowAlbum(id);}})(crtitem["Id"]));
   }
   var tempListS=[];
@@ -1108,7 +1108,7 @@ function ShowArtist(artistid){
   tempList.sort(function(a,b){if(a["Title"]>b["Title"]){return 1;}else{return -1;}});
   for(var item in tempList){
     var crtitem=tempList[item];
-    PushCardToContainer(container,crtitem["Title"],artist["Name"],(crtitem["ThumbExist"]==0?"img/cd.svg": "thumbs/"+crtitem["Id"]),"img/cd.svg"
+    PushCardToContainer(container,crtitem["Title"],artist["Name"],(crtitem["ThumbExist"]==0?"img/cd.svg": "thumbs/"+crtitem["Id"]+".png"),"img/cd.svg"
       ,(function(id){return function(){ShowAlbum(id);}})(crtitem["Id"]));
   }
   var tempListS=[];
@@ -1127,7 +1127,7 @@ function ShowAlbum(albumid){
   var container = document.getElementById("container");
   ClearMain();
 
-  PushCardToContainer(container,tempAlbum["Title"],"",(tempAlbum["ThumbExist"]==0?"img/cd.svg": "thumbs/"+tempAlbum["Id"]),"img/cd.svg");
+  PushCardToContainer(container,tempAlbum["Title"],"",(tempAlbum["ThumbExist"]==0?"img/cd.svg": "thumbs/"+tempAlbum["Id"]+".png"),"img/cd.svg");
   var tempListS=[];
   for(var key in Song){
     if(Song[key]["AlbumId"] == albumid){
