@@ -6,6 +6,10 @@ cgiで作った音楽サーバーです。
 ## Demo
 [Demo](https://kurema.github.io/musicServerCgi/)
 
+* gh-pagesブランチを参照すれば静的ページでも利用できます。
+* github pagesでこれを使って音楽を公開するってのも手です。
+* Demoは必ずしも最新版とは限りません。
+
 ## スクリーンショット
 ![PC](screenshot/pc07.png)
 ![PC](screenshot/pc10.png)
