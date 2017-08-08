@@ -1,0 +1,19 @@
+﻿[ {
+ "Format" : ".wav",
+ "ArtistID" : "1",
+ "Duration" : "5.0",
+ "Track" : "1",
+ "Title" : "Silence",
+ "Id" : "0",
+ "AlbumId" : "1"
+},
+{
+ "Format" : ".wav",
+ "ArtistID" : "1",
+ "Duration" : "5.0",
+ "Track" : "2",
+ "Title" : "Mute",
+ "Id" : "1",
+ "AlbumId" : "1"
+}
+]
