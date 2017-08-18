@@ -726,7 +726,7 @@ function ExecuteHistoryItem(history){
   if(history.Argument){func(history.Argument);}else{func();}
 }
 function GetFuncFromKey(key){
-  var funcs={"SelectSetting":SelectSetting,"SelectSong":SelectSong,"SelectPlaylist":SelectPlaylist,"SelectGenre":SelectGenre,"SelectArtist":SelectArtist,"ShowGenre":ShowGenre,"ShowArtist":ShowArtist,"ShowAlbum":ShowAlbum};
+  var funcs={"SelectSetting":SelectSetting,"SelectSong":SelectSong,"SelectPlaylist":SelectPlaylist,"SelectGenre":SelectGenre,"SelectArtist":SelectArtist,"SelectAlbum":SelectAlbum,"ShowGenre":ShowGenre,"ShowArtist":ShowArtist,"ShowAlbum":ShowAlbum};
   return funcs[key];
 }
 function HistoryPush(func,arg){
