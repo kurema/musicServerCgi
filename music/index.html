@@ -815,6 +815,12 @@ function SelectPlaylist(){
   SetSongToTable(songs,[new SongInfoTable(localization.table_track,"Track"),new SongInfoTable(localization.table_length,"Length"),new SongInfoTable(localization.table_song_title,"Title")
     ,new SongInfoTable(localization.table_song_artist,"ArtistName"),new SongInfoTable(localization.table_album_title,"AlbumName")]);
 }
+function GetGenreNameForGrouping(name){
+  name=name.replace(/[\+\-\*\/\(\)]/g,"");
+  name=name.replace(/^\s+/,"");
+  name=name.replace(/\s+$/,"");
+  return name.toLowerCase();
+}
 function SelectGenre(){
   HistoryPush("SelectGenre");
   SelectTab("tab_genre");
@@ -822,12 +828,16 @@ function SelectGenre(){
   ClearMain();
 
   var PushedGenre={};
+  var OriginalGenreName={};
   for(var key in Album){
     var genre=Album[key]["Genre"];
+    var genreKey=GetGenreNameForGrouping(genre);
     if(Album[key]["ThumbExist"]==1){
-      PushedGenre[genre]="thumb.cgi?id="+Album[key]["Id"];
+      PushedGenre[genreKey]="thumb.cgi?id="+Album[key]["Id"];
+      OriginalGenreName[genreKey]=genre;
     }else if(! PushedGenre[genre]){
-      PushedGenre[genre]="img/cd.svg";
+      PushedGenre[genreKey]="img/cd.svg";
+      OriginalGenreName[genreKey]=genre;
     }
   }
   var tempList=[];
@@ -836,7 +846,7 @@ function SelectGenre(){
   }
   tempList.sort(function(a,b){if(a>b){return 1;}else{return -1;}});
   for(var item in tempList){
-    var tempgenre=tempList[item];
+    var tempgenre=OriginalGenreName[tempList[item]];
     tempgenre=tempgenre==""?"Other":tempgenre;
     PushCardToContainer(container,tempgenre,"",PushedGenre[tempList[item]],"img/cd.svg",
       (function(genre){return function(){ShowGenre(genre);}})(tempList[item]));
@@ -857,7 +867,14 @@ function SelectArtist(){
   for(var key in PushedArtist){
     tempList.push(PushedArtist[key]);
   }
-  tempList.sort(function(a,b){if(a["Name"]>b["Name"]){return 1;}else{return -1;}});
+
+  tempList.sort(function(a,b){
+    if(a["Name"]!=b["Name"]){
+     if(CheckVarious(a["Name"])){return 1;}
+     if(CheckVarious(b["Name"])){return -1;}
+    }
+    if(GetArtistNameForSort(a["Name"])>GetArtistNameForSort(b["Name"])){return 1;}else{return -1;}}
+  );
   for(var item in tempList){
     var tempTitle="Unknown";
     if(! tempList[item]){tempTitle="Unkown";}
@@ -1014,6 +1031,14 @@ function PlayCurrent(){
 function SeekOnServer(from){
   PlaySimple(PlayingCnt,from);
 }
+var ArtistNameForSortCache={};
+function GetArtistNameForSort(name){
+  if(ArtistNameForSortCache[name]){return ArtistNameForSortCache[name];}
+  var temp=name.replace(/^\s*the\s+/i,"");
+  var temp=temp.replace(/^\s*a\s+/i,"");
+  ArtistNameForSortCache[name]=temp;
+  return temp;
+}
 function SelectAlbum(){
   HistoryPush("SelectAlbum");
   SelectTab("tab_album");
@@ -1027,9 +1052,15 @@ function SelectAlbum(){
   tempList.sort(function(a,b){
     var arta=GetArtistById(a["ArtistID"]);
     var artb=GetArtistById(b["ArtistID"]);
-    if(arta["Name"]>artb["Name"]){
+    var artaName=GetArtistNameForSort(arta["Name"]);
+    var artbName=GetArtistNameForSort(artb["Name"]);
+    if(artaName!=artbName){
+      if(CheckVarious(artaName)){return 1;}
+      if(CheckVarious(artbName)){return -1;}
+    }
+    if(artaName>artbName){
       return 1;
-    }else if(arta["Name"]==artb["Name"]){
+    }else if(artaName==artbName){
       if(a["Title"]>b["Title"]){return 1;}else{return -1;}
     }else{
       return -1;}
@@ -1056,9 +1087,9 @@ function SortSongs(a,b){
   var albumb=GetAlbumById(b["AlbumId"]);
   var arta=GetArtistById(albuma["ArtistID"]);
   var artb=GetArtistById(albumb["ArtistID"]);
-  if(arta["Name"]>artb["Name"]){return 1;}
-  else if(arta["Name"]<artb["Name"]){return -1;}
-  else{
+  var artaName=GetArtistNameForSort(arta["Name"]);
+  var artbName=GetArtistNameForSort(artb["Name"]);
+  if(artaName==artbName){
     if(albuma["Title"]>albumb["Title"]){return 1;}
     else if(albuma["Title"]<albumb["Title"]){return -1;}
     else{
@@ -1068,8 +1099,19 @@ function SortSongs(a,b){
       else{return -1;}
     }
   }
+  if(CheckVarious(artaName)){return 1;}
+  else if(CheckVarious(artbName)){return -1;}
+  if(artaName>artbName){return 1;}
+  else if(artaName<artbName){return -1;}
+}
+function CheckVarious(name){
+  if(name=="Various" || name=="Various Artists" || name==""){
+    return true;
+  }
+  return false;
 }
 function ShowGenre(genre){
+  genre=GetGenreNameForGrouping(genre);
   HistoryPush("ShowGenre",genre);
   SelectTab("tab_genre");
   var container = document.getElementById("container");
@@ -1077,19 +1119,19 @@ function ShowGenre(genre){
 
   var tempList=[];
   for(var key in Album){
-    if(Album[key]["Genre"] == genre){
+    if(GetGenreNameForGrouping(Album[key]["Genre"]) == genre){
       tempList.push(Album[key]);
     }
   }
   tempList.sort(function(a,b){if(a["Title"]>b["Title"]){return 1;}else{return -1;}});
   for(var item in tempList){
     var crtitem=tempList[item];
-    PushCardToContainer(container,crtitem["Title"],genre,(crtitem["ThumbExist"]==0?"img/cd.svg": "thumb.cgi?id="+crtitem["Id"]),"img/cd.svg"
+    PushCardToContainer(container,crtitem["Title"],crtitem["Genre"],(crtitem["ThumbExist"]==0?"img/cd.svg": "thumb.cgi?id="+crtitem["Id"]),"img/cd.svg"
       ,(function(id){return function(){ShowAlbum(id);}})(crtitem["Id"]));
   }
   var tempListS=[];
   for(var key in Song){
-    if(GetAlbumById(Song[key]["AlbumId"])["Genre"]== genre){
+    if(GetGenreNameForGrouping(GetAlbumById(Song[key]["AlbumId"])["Genre"])== genre){
       tempListS.push(Song[key]);
     }
   }

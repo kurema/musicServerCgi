@@ -92,11 +92,16 @@ print "$track. $songtitle by $artist\n";
 
 sub getArtistId{
 my ($artistarg)=@_;
+my $artistargLow=lc($artistarg);
 my $artistIDTemp;
-if(defined($artistIDs{$artistarg})){$artistIDTemp=$artistIDs{$artistarg};}else{
+$artistargLow=~ s/^\s*//g;
+$artistargLow=~ s/\s*$//g;
+$artistargLow=~ s/^the\s+//g;
+$artistargLow=~ s/^a\s+//g;
+if(defined($artistIDs{$artistargLow})){$artistIDTemp=$artistIDs{$artistargLow};}else{
 $artistID++;
 $dbh->do(("insert into artist(id,name) values($artistID,'".escape_sql($artistarg)."');"));
-$artistIDs{$artistarg}=$artistID;
+$artistIDs{$artistargLow}=$artistID;
 $artistIDTemp=$artistID;
 }
 return $artistIDTemp;
