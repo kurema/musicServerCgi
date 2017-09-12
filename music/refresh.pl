@@ -72,7 +72,17 @@ my $songinfo=getJsonInfo($file);
 my $tags=$songinfo->{"format"}->{"tags"};
 
 my ($albumartistf,$albumf,$trackf,$songtitlef)= $file=~ /\/([^\/]+?) \- ([^\/]+)\/(\d+)\.\s?([^\/]+)\.([^\/\.]+)$/;
-my ($albumartist,$album,$track,$songtitle,$albumtrack,$artist,$genre)=(getLastTag($tags->{"album_artist"}),getLastTag($tags->{"ALBUM"}),$tags->{"track"},getLastTag($tags->{"TITLE"}),$tags->{"TOTALTRACKS"},getLastTag($tags->{"ARTIST"}),getLastTag($tags->{"GENRE"}));
+my ($track,$trackTotal)=(0,0);
+if($tags->{"track"}=~ m%(\d+)/(\d+)%){
+  $track=$1;
+  $trackTotal=$2;
+}else{
+  $track=$tags->{"track"};
+  $track=~ s/[^0-9]+//g;
+  $trackTotal=$tags->{"totaltracks"};
+  $trackTotal=~ s/[^0-9]+//g;
+}
+my ($albumartist,$album,$track,$songtitle,$albumtrack,$artist,$genre)=(getLastTag($tags->{"album_artist"}),getLastTag($tags->{"album"}),$track,getLastTag($tags->{"title"}),$trackTotal,getLastTag($tags->{"artist"}),getLastTag($tags->{"genre"}));
 if($albumartist eq ""){$albumartist=$artist;}
 
 my $albumIDTemp=0;
@@ -120,6 +130,7 @@ open INFO ,"ffprobe -v quiet -print_format json -show_format \"".escape_bash_in_
 local $/ = undef;
 my $data = <INFO>;
 close(INFO);
+$data =~ s/("[^"]+"\s*\:)/lc($1)/ge;
 return from_json($data);
 }
 
