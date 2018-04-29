@@ -11,7 +11,7 @@ use open IO => qw/ :encoding(utf8) :std /;
 require DBD::SQLite;
 require DBI;
 
-require "commonm.pl";
+require File::Spec->catfile(dirname(__FILE__),"commonm.pl");
 
 my %conf=GetConf(File::Spec->catfile(dirname(__FILE__),"music.conf"));
 my $music_exts=$conf{"musicexts"};
